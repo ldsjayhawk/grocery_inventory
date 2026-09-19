@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Environment / secrets
+.env
+
+# Firebase credentials
+to-do-list-fd040-firebase-adminsdk-fbsvc-a0628bc947.json
+serviceAccountKey.json
