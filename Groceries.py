@@ -24,7 +24,8 @@ def display_menu(user_id):
     print("3. Delete item")
     print("4. View inventory")
     print("5. View grocery list")
-    print("6. Exit")
+    print("6. Logout")
+    print("7. Exit")
     print()
     print("Please make a selection: ")
 
@@ -32,7 +33,7 @@ def display_menu(user_id):
 
     # send user to correct function based on menu choice
     # 6 prints Thank you and exits program
-    if menu_choice == "6":
+    if menu_choice == "7":
         print("Thank you!")
         print()
         exit()
@@ -51,6 +52,11 @@ def display_menu(user_id):
 
     elif menu_choice == "5":
         display_grocery_list(user_id)
+
+    elif menu_choice == "6":
+        print('You are now logged out.  Thank you!')
+        user_id = check_login()
+        display_menu(user_id)
 
     else: 
         display_menu(user_id)

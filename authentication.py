@@ -7,7 +7,9 @@ load_dotenv()
 api_key = os.getenv("FIREBASE_API_KEY")
 
 def check_login():
-    login_path = input('Would you like to login(l) or register for an account(r)? ')
+    print()
+    login_check = input('Would you like to login(l) or register for an account(r)? ')
+    login_path = login_check.lower()
     if login_path == 'l':
         return login()
     elif login_path == 'r':
@@ -48,8 +50,6 @@ def login():
 
     return login_data["localId"]
 
-def logout():
-    print("logout")
 
 def register():
     # variables for user input
