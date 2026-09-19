@@ -2,6 +2,9 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 
+from authentication import register, login
+
+
 # Fetch the service account key JSON file contents
 cred = credentials.Certificate('to-do-list-fd040-firebase-adminsdk-fbsvc-a0628bc947.json')
 
@@ -209,6 +212,9 @@ def display_grocery_list(menu="yes"):
     if menu == "yes":
         display_menu()
 
+
+user_id = login()
+print(user_id)
 
 # calls display menu function to begin the program
 display_menu()
