@@ -9,12 +9,12 @@ api_key = os.getenv("FIREBASE_API_KEY")
 def check_login():
     login_path = input('Would you like to login(l) or register for an account(r)? ')
     if login_path == 'l':
-        login()
+        return login()
     elif login_path == 'r':
-        register()
+        return register()
     else:
         print('Invalid Reponse')
-        check_login()
+        return check_login()
 
 
 def login():
@@ -37,10 +37,10 @@ def login():
     login_data = login_user.json()
 
     # check for errors
-    if 'error' in login_data:    
+    if 'error' in login_data:
         print(login_data["error"]["message"])
         print('Please try again')
-        login()
+        return login()
     # elif login_data["displayName"] == None:
     #     print(f'Hello there!')
     else:
@@ -75,16 +75,16 @@ def register():
     if 'error' in register_data:    
         if register_data["error"]["message"] == 'EMAIL_EXISTS':
             print('Email already exists, please sign-in')
-            login()
+            return login()
 
         elif register_data["error"]["message"] != 'EMAIL_EXISTS':
             print(register_data["error"]["message"])
-            register()
+            return register()
     else:
         print('Registration succeeded.')
 
     # send user to login when complete
-    login()
+    return login()
 
-check_login()
+# check_login()
 

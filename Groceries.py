@@ -2,7 +2,7 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 
-from authentication import register, login
+from authentication import check_login
 
 
 # Fetch the service account key JSON file contents
@@ -16,7 +16,7 @@ db = firestore.client()
 
 
 # display menu function
-def display_menu():
+def display_menu(user_id):
     print()
     print("Grocery Inventory Menu")
     print("1. Add new item")
@@ -38,26 +38,26 @@ def display_menu():
         exit()
 
     elif menu_choice == "1":
-        add_item()
+        add_item(user_id)
 
     elif menu_choice == "2":
-        edit_item()
+        edit_item(user_id)
 
     elif menu_choice == "3":
-        delete_item()
+        delete_item(user_id)
 
     elif menu_choice == "4":
-        display_inventory()
+        display_inventory(user_id)
 
     elif menu_choice == "5":
-        display_grocery_list()
+        display_grocery_list(user_id)
 
     else: 
-        display_menu()
+        display_menu(user_id)
 
 # Add item function
 # Takes user input item and stores in item list
-def add_item():
+def add_item(user_id):
     #get user inputs
     print('Enter UPC')
     upc = input()
@@ -83,21 +83,21 @@ def add_item():
 
     # save new item as dictionary and add to 
     new_item = {'upc': upc, 'name': name, 'quantity': quantity, "location": location}
-    db.collection('inventory').document(upc).set(new_item)
+    db.collection('users').document(user_id).collection('inventory').document(upc).set(new_item)
 
-    display_inventory()
-    display_menu()
+    display_inventory(user_id)
+    # display_menu()
 
 # Edit item function
-def edit_item():
+def edit_item(user_id):
     # display todo list - pass no to prevent display of menu
-    display_inventory("no")
+    display_inventory(user_id, "no")
     # select item to edit
     print('Enter UPC for item to edit: ')
     selected_item = input()
     edit_choice = ''
 
-    docs = db.collection("inventory").stream()
+    docs = db.collection("users").document(user_id).collection("inventory").stream()
 
     for doc in docs:
         data = doc.to_dict()
@@ -107,23 +107,23 @@ def edit_item():
             if edit_choice == "1":
                 print('Enter new UPC:')
                 new_upc = input()
-                db.collection('inventory').document(selected_item).update({"upc":new_upc})
+                db.collection("users").document(user_id).collection('inventory').document(selected_item).update({"upc":new_upc})
 
             elif edit_choice == "2":
                 print('Enter new item name: ')
                 new_name = input()
-                db.collection('inventory').document(selected_item).update({"name":new_name})
+                db.collection("users").document(user_id).collection('inventory').document(selected_item).update({"name":new_name})
 
             elif edit_choice == "3":
                 print('Enter new item quantity: ')
                 qty = input()
                 new_qty = int(qty)
-                db.collection('inventory').document(selected_item).update({"quantity":new_qty})
+                db.collection("users").document(user_id).collection('inventory').document(selected_item).update({"quantity":new_qty})
 
             elif edit_choice == "4":
                 print('Enter storage location: ')
                 new_location = input()
-                db.collection('inventory').document(selected_item).update({"location":new_location})
+                db.collection("users").document(user_id).collection('inventory').document(selected_item).update({"location":new_location})
 
             # elif edit_choice == "5":
             #     print('Enter expiration date: ')
@@ -134,8 +134,8 @@ def edit_item():
                 print(f'{edit_choice} is not a valid option.  Please choose again.')
                 display_edit_menu()
 
-    display_inventory()
-    display_menu()
+    display_inventory(user_id)
+    display_menu(user_id)
 
 def display_edit_menu(selected_item):
     # enter new item
@@ -154,32 +154,33 @@ def display_edit_menu(selected_item):
 
 
 # Delete item function
-def delete_item():
+def delete_item(user_id):
     # display todo list - pass no to prevent display of menu
-    display_inventory("no")
+    display_inventory(user_id, "no")
 
     # select item to delete
     print('Enter UPC for item to delete: ')
     selected_item = input()
 
     # find and delete selected item
-    docs = db.collection("inventory").stream()
+    docs = db.collection("users").document(user_id).collection("inventory").stream()
 
     for doc in docs:
         data = doc.to_dict()
         if selected_item == data["upc"]:
-            db.collection("inventory").document(data["upc"]).delete()
+            db.collection("users").document(user_id).collection("inventory").document(data["upc"]).delete()
 
-    display_inventory()
-    display_menu()
+    display_inventory(user_id)
+    display_menu(user_id)
 
 # View item list function
 # Displays all grocery_list in the item list by looping through grocery_list variable
-def display_inventory(menu='yes'):
+def display_inventory(user_id, menu='yes'):
     print()
     print("Inventory:")
+    # print(user_id)
 
-    docs = db.collection("inventory").stream()
+    docs = db.collection("users").document(user_id).collection("inventory").stream()
 
     for doc in docs:
         data = doc.to_dict()
@@ -190,14 +191,16 @@ def display_inventory(menu='yes'):
         print()
 
     if menu == "yes":
-        display_menu()
+        display_menu(user_id)
 
-def display_grocery_list(menu="yes"):
+def display_grocery_list(user_id, menu="yes"):
     grocery_list = []
     print()
     print("Grocery List:")
+    # print(user_id)
 
-    docs = db.collection("inventory").stream()
+    docs = db.collection("users").document(user_id).collection("inventory").stream()
+    
 
     for doc in docs:
         data = doc.to_dict()
@@ -210,11 +213,10 @@ def display_grocery_list(menu="yes"):
         print(item)
 
     if menu == "yes":
-        display_menu()
+        display_menu(user_id)
 
 
-user_id = login()
-print(user_id)
+user_id = check_login()
 
 # calls display menu function to begin the program
-display_menu()
+display_menu(user_id)
